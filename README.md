@@ -16,6 +16,8 @@ Forked from [jop](https://github.com/jop-devel/jop) primarily to port to the [MA
 [vhdplus](https://shop.vhdplus.com/product/max1000/)
 [arrow](https://www.arrow.com/en/products/tei0001-04-dbc83a/trenz-electronic-gmbh)
 
+Other candidates:
+
 #### CYC1000 with Cyclone 10 FPGA, 8 MB SDRAM, 8 MBFlash, 6.15 x 2.5 cm
 [Getting started](https://wiki.trenz-electronic.de/display/PD/TEI0003+Getting+Started#TEI0003GettingStarted-Overview)
 
