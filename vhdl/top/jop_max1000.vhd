@@ -38,36 +38,36 @@ entity jop is
 
   generic (
     jpc_width  : integer := 12;  -- address bits of java bytecode pc = cache size
-    block_bits : integer := 4;   -- 2*block_bits is number of cache blocks
-    spm_width  : integer := 0  -- size of scratchpad RAM (in number of address bits for 32-bit words)
+    block_bits : integer := 10;   -- 2*block_bits is number of cache blocks
+    spm_width  : integer := 0    -- size of scratchpad RAM (in number of address bits for 32-bit words)
   );
 
   port (
-    clk_in     : in  std_logic;
+    clk_in          :   in  std_logic;
     --
     -- serial interface
     --
-    ser_rxd : in  std_logic;
-    ser_ncts : in std_logic;
-    ser_txd : out std_logic;
-    ser_nrts : out std_logic;
+    ser_rxd         :   in  std_logic;
+    ser_ncts        :   in std_logic;
+    ser_txd         :   out std_logic;
+    ser_nrts        :   out std_logic;
     --
     -- sdram
     --
-    dram_ctrl : out   dram_ctrl_type;
-    dram_data : inout dram_data_type;
+    dram_ctrl       :   out   dram_ctrl_type;
+    dram_data       :   inout dram_data_type;
 	--
 	-- leds
 	--
-	leds		: out std_logic_vector(7 downto 0);
+	leds            :   out std_logic_vector(7 downto 0);
 	--
 	-- button
 	--
-	button		: in std_logic;
+	buttons         :   in std_logic_vector(1 downto 0);
     --
     -- watchdog
     --
-    wd : out std_logic
+    wd              :   out std_logic
   );
 
 end jop;
@@ -135,7 +135,7 @@ begin
         generic map(
             multiply_by => pll_mult,
             divide_by => pll_div
-	    ) port map (
+        ) port map (
             inclk0 => clk_in,              -- [in]
             c0     => internal_clk,        -- [out]      
             c1     => dpll.clk,            -- [out]
@@ -144,44 +144,44 @@ begin
         );
 
     cpu : entity work.jopcpu
-    generic map (
-        jpc_width  => jpc_width,
-        block_bits => block_bits,
-        spm_width  => spm_width
-    ) port map (
-        internal_clk, int_res,
-        sc_mem_out, sc_mem_in,
-        sc_io_out, sc_io_in,
-        irq_in, irq_out, exc_req
-    );
+        generic map (
+            jpc_width  => jpc_width,
+            block_bits => block_bits,
+            spm_width  => spm_width
+        ) port map (
+            internal_clk, int_res,
+            sc_mem_out, sc_mem_in,
+            sc_io_out, sc_io_in,
+            irq_in, irq_out, exc_req
+        );
 
     io : entity work.scio
-    port map (
-        internal_clk,
-        int_res,
-        sc_io_out,
-        sc_io_in,
-        irq_in,
-        irq_out,
-        exc_req,
-        txd       => ser_txd,
-        rxd       => ser_rxd,
-        ncts      => ser_ncts,
-        nrts      => ser_nrts,
-        wd        => wd,
-        button    => button,
-        leds      => leds
-    );
+        port map (
+            internal_clk,
+            int_res,
+            sc_io_out,
+            sc_io_in,
+            irq_in,
+            irq_out,
+            exc_req,
+            txd       => ser_txd,
+            rxd       => ser_rxd,
+            ncts      => ser_ncts,
+            nrts      => ser_nrts,
+            wd        => wd,
+            buttons   => buttons,
+            leds      => leds
+        );
 
     scm: entity work.sc_mem_if
-    port map (
-        clk        => internal_clk,           -- [in]
-        reset      => int_res,           -- [in]
-        sc_mem_out => sc_mem_out,        -- [in]
-        sc_mem_in  => sc_mem_in,         -- [out]
-        dram_pll   => dpll,              -- [in]
-        dram_ctrl  => dram_ctrl,         -- [out]
-        dram_data  => dram_data          -- [inout]
-    );
+        port map (
+            clk        => internal_clk,      -- [in]
+            reset      => int_res,           -- [in]
+            sc_mem_out => sc_mem_out,        -- [in]
+            sc_mem_in  => sc_mem_in,         -- [out]
+            dram_pll   => dpll,              -- [in]
+            dram_ctrl  => dram_ctrl,         -- [out]
+            dram_data  => dram_data          -- [inout]
+        );
 
 end rtl;

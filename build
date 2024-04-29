@@ -1,10 +1,19 @@
 #!/bin/bash
 
+#ubuntu/linux
 #export QUARTUS="$HOME/intelFPGA_lite/18.1/quartus"
-export QUARTUS="$HOME/intelFPGA_lite/23.1std/quartus"
-export JAVA_HOME="$HOME/jdk1.6.0_45"
+#export QUARTUS="$HOME/intelFPGA_lite/23.1std/quartus"
+#export JAVA_HOME="$HOME/jdk1.6.0_45"
 #export JAVA_HOME="$HOME"/jdk1.8.0_202"
-export PATH="$QUARTUS/bin:$JAVA_HOME/bin:$PATH"
+
+#msys2/windows
+export QUARTUS="/c/intelFPGA_lite/23.1lite/quartus"
+export JAVA_HOME="/c/Users/peter/jdk1.6.0_45"
+
+export PATH="$QUARTUS/bin64:$JAVA_HOME/bin:$PATH"
+
+java -version
+quartus_pgm -a
 
 #make clean
 #make directories
@@ -12,7 +21,7 @@ export PATH="$QUARTUS/bin:$JAVA_HOME/bin:$PATH"
 #make jop_blink_test
 #make jop_testmon
 #make jopser
-make japp
+#make japp
 #make jsim
 #make japp −e P1=bench P2=jbe P3=DoAll
 #make japp −e P1=test P2=test P3=HelloWorld
@@ -21,4 +30,4 @@ make japp
 #cd quartus/max1000 && quartus_pgm -c Arrow-USB-Blaster -m JTAG jop.cdf
 #cd ../..
 #./down -e -c java/target/dist/bin/LedSwitchPattern.jop /dev/ttyUSB1
-
+./down.exe -e -c java/target/dist/bin/LedSwitchPattern.jop COM9

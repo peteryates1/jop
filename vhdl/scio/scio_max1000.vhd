@@ -78,9 +78,9 @@ port (
 	--
 	leds		: out std_logic_vector(7 downto 0);
 	--
-	-- button
+	-- buttons
 	--
-	button		: in std_logic
+	buttons		: in std_logic_vector(1 downto 0)
 );
 end scio;
 
@@ -218,7 +218,7 @@ begin
 		
 		oLEDR(7 downto 0) => leds,
 --		oLEDG => oLEDG,
-		iSW(0) => button
+		iSW(1 downto 0) => buttons
 	);
 
 end rtl;
