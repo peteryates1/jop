@@ -40,7 +40,7 @@ ifeq ($(USB),true)
 else
 	COM_FLAG=-e
 ifeq ($(WINDIR),)
-	COM_PORT=/dev/ttyS0
+	COM_PORT=/dev/ttyUSB1
 else 
 	COM_PORT=COM1
 endif
@@ -50,14 +50,14 @@ endif
 #	Select the Quartus project
 #
 # 'some' different Quartus projects
-QPROJ=cycmin cycbaseio cycbg dspio lego cycfpu cyc256x16 sopcmin usbmin cyccmp de2-70vga cycrttm de2-70rttm
+#QPROJ=max1000 cycmin cycbaseio cycbg dspio lego cycfpu cyc256x16 sopcmin usbmin cyccmp de2-70vga cycrttm de2-70rttm
 
 # if you want to build only one Quartus project use e.q.:
-ifeq ($(USB),true)
-	QPROJ=usbmin
-else
-	QPROJ=altde2-70
-endif
+# ifeq ($(USB),true)
+# 	QPROJ=usbmin
+# else
+ 	QPROJ=max1000
+# endif
 
 #
 #	Select the Xilinx project byt setting XFPGA to true
@@ -68,7 +68,8 @@ XFPGA=false
 
 # Altera FPGA configuration cable
 #BLASTER_TYPE=ByteBlasterMV
-BLASTER_TYPE=USB-Blaster
+#BLASTER_TYPE=USB-Blaster
+BLASTER_TYPE=Arrow-USB-Blaster
 
 ifeq ($(WINDIR),)
 	DOWN=./down
@@ -134,8 +135,8 @@ JOP_CONF_STR=USE_SCOPES=$(USE_SCOPES) USE_SCOPECHECKS=$(USE_SCOPECHECKS) ADD_REF
 
 P1=test
 P2=test
-P3=HelloWorld
-
+#P3=HelloWorld
+P3=LedSwitchPattern
 #
 # Run JVM Tests
 # 
@@ -483,7 +484,7 @@ else
 	@echo $(QPROJ)
 	for target in $(QPROJ); do \
 		make qsyn -e QBT=$$target || exit; \
-		quartus_cpf  -c -q 10MHz -g 3.3 -n p quartus/$$target/jop.sof rbf/jop.svf; \
+		quartus_cpf  -c -q 10MHz -g 3.3 -n p quartus/$$target/output_files/jop.sof rbf/jop.svf; \
 	done
 endif
 
@@ -496,7 +497,7 @@ jopusb:
 	@echo $(QPROJ)
 	for target in $(QPROJ); do \
 		make qsyn -e QBT=$$target || exit; \
-		cd quartus/$$target && quartus_cpf -c jop.sof ../../rbf/$$target.rbf; \
+		cd quartus/$$target && quartus_cpf -c output_files/jop.sof ../../rbf/$$target.rbf; \
 	done
 
 #
@@ -507,7 +508,7 @@ jopflash:
 	@echo $(QPROJ)
 	for target in $(QPROJ); do \
 		make qsyn -e QBT=$$target || exit; \
-		quartus_cpf -c quartus/$$target/jop.sof ttf/$$target.ttf; \
+		quartus_cpf -c quartus/$$target/output_files/jop.sof ttf/$$target.ttf; \
 	done
 
 BLOCK_SIZE=4096
@@ -535,7 +536,7 @@ qsyn:
 	echo $(QBT)
 	echo "building $(QBT)"
 	-rm -rf quartus/$(QBT)/db
-	-rm -f quartus/$(QBT)/jop.sof
+	-rm -f quartus/$(QBT)/output_files
 	-rm -f jbc/$(QBT).jbc
 	-rm -f rbf/$(QBT).rbf
 	quartus_map quartus/$(QBT)/jop
@@ -736,7 +737,7 @@ jop_blink_test:
 		quartus_asm $$qp; \
 #		quartus_tan $$qp; \
 		quartus_sta $$qp; \
-		cd quartus/$$target && quartus_cpf -c jop.sof ../../rbf/$$target.rbf; \
+		cd quartus/$$target && quartus_cpf -c output_files/jop.sof ../../rbf/$$target.rbf; \
 	done
 	make config
 	e $(COM_PORT)
@@ -755,7 +756,7 @@ jop_testmon:
 		quartus_asm $$qp; \
 #		quartus_tan $$qp; \
 		quartus_sta $$qp; \
-		cd quartus/$$target && quartus_cpf -c jop.sof ../../rbf/$$target.rbf; \
+		cd quartus/$$target && quartus_cpf -c output_files/jop.sof ../../rbf/$$target.rbf; \
 	done
 	make config
 

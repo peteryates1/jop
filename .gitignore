@@ -17,3 +17,19 @@ java/tools/dist
 #
 velocity.log*
 
+quartus/*/jop.cdf
+quartus/*/db
+quartus/*/incremental_db
+quartus/*/output_files
+quartus/*/.qsys_edit
+
+modelsim/mem_ram.dat
+modelsim/mem_rom.dat
+modelsim/mem_main.dat
+
+vhdl/rom.vhd
+vhdl/xv4ram_block.vhd
+vhdl/xram_block.vhd
+vhdl/jtbl.vhd
+vhdl/actelram_initrom.vhd
+
