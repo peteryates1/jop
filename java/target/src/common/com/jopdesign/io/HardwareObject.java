@@ -22,5 +22,5 @@ package com.jopdesign.io;
 
 public abstract class HardwareObject {
 	
-	HardwareObject() {};
+	protected HardwareObject() {};
 }

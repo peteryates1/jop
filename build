@@ -1,33 +1,50 @@
-#!/bin/bash
+#!/bin/bash -x 
 
 #ubuntu/linux
 #export QUARTUS="$HOME/intelFPGA_lite/18.1/quartus"
-#export QUARTUS="$HOME/intelFPGA_lite/23.1std/quartus"
-#export JAVA_HOME="$HOME/jdk1.6.0_45"
-#export JAVA_HOME="$HOME"/jdk1.8.0_202"
+QUARTUS="$HOME/intelFPGA_lite/23.1std/quartus"
+PATH="$QUARTUS/bin:$PATH"
+QUESTA_HOME="$HOME/intelFPGA_lite/23.1std/questa_fse"
+PATH="$QUESTA_HOME/bin:$PATH"
+JAVA_HOME="$HOME/jdk1.6.0_45"
+#JAVA_HOME="$HOME/jdk1.8.0_202"
+PATH="$JAVA_HOME/bin:$PATH"
 
-#msys2/windows
-export QUARTUS="/c/intelFPGA_lite/23.1lite/quartus"
-export JAVA_HOME="/c/Users/peter/jdk1.6.0_45"
+# P3=HelloWorld
+# P3=LedSwitchPattern
+# P3=MyApp
+P3=SpiritLevel
+# P3=SPIFlash
 
-export PATH="$QUARTUS/bin64:$JAVA_HOME/bin:$PATH"
+# msys2/windows
+# export QUARTUS="/c/intelFPGA_lite/23.1lite/quartus"
+# export JAVA_HOME="/c/Users/peter/jdk1.6.0_45"
+# export PATH="$QUARTUS/bin64:$JAVA_HOME/bin:$PATH"
 
-java -version
-quartus_pgm -a
+# java -version
+# quartus_pgm -a
 
-#make clean
-#make directories
-#make tools
-#make jop_blink_test
-#make jop_testmon
-#make jopser
-#make japp
-#make jsim
-#make japp −e P1=bench P2=jbe P3=DoAll
-#make japp −e P1=test P2=test P3=HelloWorld
-#make japp −e P1=test P2=test P3=LedSwitchPattern
+# gcc c_src/down_posix.c -o down
+# gcc c_src/echo_posix.c -o e
 
-#cd quartus/max1000 && quartus_pgm -c Arrow-USB-Blaster -m JTAG jop.cdf
-#cd ../..
-#./down -e -c java/target/dist/bin/LedSwitchPattern.jop /dev/ttyUSB1
-./down.exe -e -c java/target/dist/bin/LedSwitchPattern.jop COM9
+# make clean 
+# make directories
+# make tools
+# make jop_blink_test
+# make jop_testmon
+
+# make jopser && \
+make japp
+# make sim
+# cd ghdl && ./run.sh 
+# cd ..
+
+# make jsim
+# make japp P1=test P2=test P3=$P3 && minicom -b 460800 -o -D /dev/ttyUSB1
+
+# cd quartus/max1000 && quartus_pgm -c Arrow-USB-Blaster -m JTAG jop.cdf
+# cd ../..
+# ./down -e -usb java/target/dist/bin/$P3.jop /dev/ttyUSB2
+# ./down -usb java/target/dist/bin/$P3.jop /dev/ttyUSB1 && \
+# minicom -b 460800 -o -D /dev/ttyUSB1
+

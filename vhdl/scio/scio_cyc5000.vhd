@@ -82,33 +82,20 @@ port (
 	--
 	buttons		: in std_logic_vector(1 downto 0);
 	--
-	-- spi flash
+	-- qspi flash
 	--
 	flash_select : out std_logic;
 	flash_sclk : out std_logic;
 	flash_mosi : out std_logic;
-	flash_miso : in std_logic;
-	--
-	-- spi accelerometer
-	--
-	accelerometer_select : out std_logic;
-	accelerometer_sclk : out std_logic;
-	accelerometer_mosi : out std_logic;
-	accelerometer_miso : in std_logic;
-	--
-	-- spi
-	-- 
-	spi_select : out std_logic;
-	spi_sclk : out std_logic;
-	spi_mosi : out std_logic;
-	spi_miso : in std_logic
+	flash_miso : in std_logic
+	
 );
 end scio;
 
 
 architecture rtl of scio is
 
-	constant SLAVE_CNT : integer := 8;
+	constant SLAVE_CNT : integer := 7;
 	-- SLAVE_CNT <= 2**DECODE_BITS
 	-- take care of USB address 0x20!
 	constant DECODE_BITS : integer := 3;
@@ -128,10 +115,6 @@ architecture rtl of scio is
 	
 	-- remove the comment for RAM access counting 
 	-- signal ram_count : std_logic;
-
-
-	signal nc_leds          : std_logic_vector(17 downto 8);
-	signal nc_buttons		: std_logic_vector(17 downto 2);
 
 begin
 
@@ -242,9 +225,7 @@ begin
 		sc_rdy_cnt => sc_rdy_cnt(4),
 		
 		oLEDR(7 downto 0) => leds,
-		oLEDR(17 downto 8) => nc_leds,
-		iSW(1 downto 0) => buttons,
-		iSW(17 downto 2) => nc_buttons
+		iSW(1 downto 0) => buttons
 	);
 
 	flash_spi : entity work.sc_spi
@@ -266,48 +247,6 @@ begin
 		SCLK       => flash_sclk,
 		MOSI_IO0   => flash_mosi,
 		MISO_IO1   => flash_miso
-	);
-
-	accelerometer_spi : entity work.sc_spi
-	generic map (
-		addr_bits => SLAVE_ADDR_BITS,
-		clock_frequency => clk_freq
-	) port map (
-		clock      => clk,
-		reset      => reset,
-		
-		sc_address => sc_io_out.address(SLAVE_ADDR_BITS-1 downto 0),
-		sc_rd      => sc_rd(6),
-		sc_rd_data => sc_dout(6),
-		sc_wr      => sc_wr(6),
-		sc_wr_data => sc_io_out.wr_data,
-		sc_rdy_cnt => sc_rdy_cnt(6),
-		
-		CS_N(0)    => accelerometer_select,
-		SCLK       => accelerometer_sclk,
-		MOSI_IO0   => accelerometer_mosi,
-		MISO_IO1   => accelerometer_miso
-	);
-
-	spi0 : entity work.sc_spi
-	generic map (
-		addr_bits => SLAVE_ADDR_BITS,
-		clock_frequency => clk_freq
-	) port map (
-		clock      => clk,
-		reset      => reset,
-		
-		sc_address => sc_io_out.address(SLAVE_ADDR_BITS-1 downto 0),
-		sc_rd      => sc_rd(7),
-		sc_rd_data => sc_dout(7),
-		sc_wr      => sc_wr(7),
-		sc_wr_data => sc_io_out.wr_data,
-		sc_rdy_cnt => sc_rdy_cnt(7),
-		
-		CS_N(0)    => spi_select,
-		SCLK       => spi_sclk,
-		MOSI_IO0   => spi_mosi,
-		MISO_IO1   => spi_miso
 	);
 
 end rtl;

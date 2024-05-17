@@ -64,6 +64,7 @@ architecture sim of jbc is
 	signal reg_wr_addr		: std_logic_vector(jpc_width-3 downto 0);
 	signal reg_wr_en		: std_logic;
 
+	signal reg_rd_addr_bs   : std_logic_vector(1 downto 0);
 
 	subtype word is std_logic_vector(32-1 downto 0);
 	constant nwords : integer := 2**(jpc_width-2);
@@ -95,8 +96,9 @@ process(reg_rd_addr, reg_wr_en)
 begin
 	address := to_integer(unsigned(reg_rd_addr(jpc_width-1 downto 2)));
 	d := ram(address);
+	reg_rd_addr_bs <= reg_rd_addr(1 downto 0);
 -- is this byte order correct???
-	case reg_rd_addr(1 downto 0) is
+	case reg_rd_addr_bs is
 		when "11" =>
 			q <= d(31 downto 24);
 		when "10" =>

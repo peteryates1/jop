@@ -1,12 +1,12 @@
 JOP stands for Java Optimized Processor. JOP is a Java processor intended for embedded real-time systems.
 
-Forked from [jop](https://github.com/jop-devel/jop) primarily to port to the [MAX1000](https://shop.trenz-electronic.de/en/TEI0001-04-DBC83A-MAX1000-IoT-Maker-Board-8kLE-8-MByte-SDRAM-8-MByte-Flash-6.15-x-2.5-cm).
+Forked from [JOP](https://github.com/jop-devel/jop) primarily to port to the [MAX1000](https://shop.trenz-electronic.de/en/TEI0001-04-DBC83A-MAX1000-IoT-Maker-Board-8kLE-8-MByte-SDRAM-8-MByte-Flash-6.15-x-2.5-cm).
 
 [An Introduction into the Design Flow for JOP](https://www.jopdesign.com/doc/build.pdf)
 
 [JOP Reference Handbook](https://www.jopdesign.com/doc/handbook.pdf)
 
-[Jop Design Website](https://www.jopdesign.com/)
+[JOP Design Website](https://www.jopdesign.com/)
 
 
 
@@ -15,6 +15,15 @@ Forked from [jop](https://github.com/jop-devel/jop) primarily to port to the [MA
 
 [vhdplus](https://shop.vhdplus.com/product/max1000/)
 [arrow](https://www.arrow.com/en/products/tei0001-04-dbc83a/trenz-electronic-gmbh)
+
+[MAX10 Datasheet](https://cdrdv2.intel.com/v1/dl/getContent/666319?fileName=m10_datasheet-683794-666319.pdf)
+
+[sdram 8MB sdr w9864g6jt](https://www.winbond.com/resource-files/w9864g6jt_a03_20170331.pdf)
+
+[flash 8MB W74M64FV](https://datasheetspdf.com/pdf-down/W/7/4/W74M64FV-Winbond.pdf) refers to [flash 8MB W25Q64FV](https://www.winbond.com/hq/support/documentation/downloadV2022.jsp?__locale=en&xmlPath=/support/resources/.content/item/DA00-W25Q64FV.html&level=1)
+
+[LIS3DH Datasheet](https://www.st.com/resource/en/datasheet/lis3dh.pdf) 3-axis MEMS accelerometer, ultra-low-power, ±2g/4g/8g/16g full scale, high-speed I2C/SPI digital output, embedded FIFO, high-performance acceleration sensor, LGA 16 3x3x1.0 package
+
 
 Other candidates:
 

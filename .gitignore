@@ -22,10 +22,13 @@ quartus/*/db
 quartus/*/incremental_db
 quartus/*/output_files
 quartus/*/.qsys_edit
+quartus/*/simulation/
 
 modelsim/mem_ram.dat
 modelsim/mem_rom.dat
 modelsim/mem_main.dat
+
+vsim
 
 vhdl/rom.vhd
 vhdl/xv4ram_block.vhd
@@ -33,3 +36,12 @@ vhdl/xram_block.vhd
 vhdl/jtbl.vhd
 vhdl/actelram_initrom.vhd
 
+ghdl/sim.ghw
+ghdl/work-obj93.cf
+
+vhdl/scio/sim.ghw
+vhdl/scio/work-obj93.cf
+vhdl/scio/spi/sim.ghw
+vhdl/scio/spi/work-obj93.cf
+
+ghdl/*.dat

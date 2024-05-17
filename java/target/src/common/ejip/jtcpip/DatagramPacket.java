@@ -37,11 +37,13 @@ import java.io.IOException;
 
 import javax.microedition.io.Datagram;
 
+import com.jopdesign.util.NotYetImplementedException;
+
 /**
  * Container for a UDP datagram. The DatagamPacket acts as a container for
  * incoming and outgoing UDP datagrams. It offers functions to read and write
- * data to its buffer and the remote address as truncated connector string (ÒIP
- * address:portÓ). The buffer that is used has to be provided at the
+ * data to its buffer and the remote address as truncated connector string (ï¿½IP
+ * address:portï¿½). The buffer that is used has to be provided at the
  * instantiation. This allows reuse of a buffer on systems with limited memory
  * (or systems without a Garbage Collector).
  * 
@@ -477,7 +479,36 @@ public class DatagramPacket implements Datagram
 	}
 
 	public void writeUTF(String value) throws IOException {
-		// TODO Auto-generated method stub
-		
+		throw new NotYetImplementedException();
+	}
+
+	@Override
+	public float readFloat() throws IOException {
+		throw new NotYetImplementedException();
+	}
+
+	@Override
+	public double readDouble() throws IOException {
+		throw new NotYetImplementedException();
+	}
+
+	@Override
+	public String readLine() throws IOException {
+		throw new NotYetImplementedException();
+	}
+
+	@Override
+	public void writeFloat(float v) throws IOException {
+		throw new NotYetImplementedException();
+	}
+
+	@Override
+	public void writeDouble(double v) throws IOException {
+		throw new NotYetImplementedException();
+	}
+
+	@Override
+	public void writeBytes(String s) throws IOException {
+		throw new NotYetImplementedException();
 	}
 }

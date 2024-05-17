@@ -38,9 +38,10 @@ ifeq ($(USB),true)
 	COM_PORT=COM5
 	COM_FLAG=-e -usb
 else
-	COM_FLAG=-e
+#	COM_FLAG=-e -usb
+	COM_FLAG=-e -usb
 ifeq ($(WINDIR),)
-	COM_PORT=/dev/ttyUSB1
+	COM_PORT=/dev/ttyUSB2
 else 
 	COM_PORT=COM1
 endif
@@ -57,6 +58,7 @@ endif
 # 	QPROJ=usbmin
 # else
  	QPROJ=max1000
+	# QPROJ=cyc5000
 # endif
 
 #
@@ -89,7 +91,7 @@ CLDC11=false
 #
 #	Whether to use JDK 1.6
 #
-JDK16=false
+JDK16=true
 
 # Currently same hardware is used so all three cannot be "yes" at the same time
 # Remember to edit decode.vhd file and uncomment/comment the appropriate microcode
@@ -135,8 +137,14 @@ JOP_CONF_STR=USE_SCOPES=$(USE_SCOPES) USE_SCOPECHECKS=$(USE_SCOPECHECKS) ADD_REF
 
 P1=test
 P2=test
-#P3=HelloWorld
-P3=LedSwitchPattern
+# P3=SPIFlash
+P3=SpiritLevel
+# P3=HelloWorld
+# P3=LedSwitchPattern
+# P3=MyApp
+# P2=cmp
+# P3=HelloCMP
+
 #
 # Run JVM Tests
 # 
@@ -250,9 +258,8 @@ MAIN_CLASS=$(P2)/$(P3)
 
 # here an example how to define an application outside
 # from the jop directory tree
-#TARGET_APP_PATH=/usr2/muvium/jopaptalone/src
-#MAIN_CLASS=com/muvium/eclipse/PeriodicTimer/JOPBootstrapLauncher
-
+#TARGET_APP_PATH=/home/peter/workspaces/jop/my-jop-app/src
+#MAIN_CLASS=test/MyApp
 
 #	add more directoies here when needed
 #		(and use \; to escape the ';' when using a list!)
@@ -438,7 +445,7 @@ endif
 	javac $(TARGET_JFLAGS) $(TARGET_APP)
 # WCETPreprocess, overwrite existing class files 
 	java $(DEBUG_JOPIZER) $(TOOLS_CP) com.jopdesign.wcet.WCETPreprocess \
-           -c $(TARGET)/dist/classes -o $(TARGET)/dist $(MAIN_CLASS)
+          -c $(TARGET)/dist/classes -o $(TARGET)/dist $(MAIN_CLASS)
 # Optimize
 ifeq ($(USE_JCOPTER),yes)
 ifeq (${JCOPTER_USE_WCA},no)
@@ -465,6 +472,7 @@ endif
 #		-cp $(TARGET)/dist/lib/classes.jar -o $(TARGET)/dist/bin/$(JOPBIN) $(MAIN_CLASS)
 	java $(TOOLS_CP) com.jopdesign.tools.jop2dat $(TARGET)/dist/bin/$(JOPBIN)
 	cp *.dat modelsim
+	cp *.dat ghdl
 	rm -f *.dat
 
 jcopter_help:
@@ -527,7 +535,7 @@ gen_mem:
 # copy generated files into working directories
 	cp asm/generated/*.vhd vhdl
 	cp asm/generated/*.dat modelsim
-
+	cp asm/generated/*.dat ghdl
 #
 #	Quartus build process
 #		called by jopser, jopusb,...
@@ -551,8 +559,9 @@ qsyn:
 #
 sim: java_app
 	make gen_mem -e ASM_SRC=jvm JVM_TYPE=SIMULATION
-	cd modelsim && make
-
+#	cd modelsim && make
+	cd ghdl && ./run.sh
+	cd ..
 
 #
 #	Modelsim target for CMP version of JOP
@@ -737,10 +746,16 @@ jop_blink_test:
 		quartus_asm $$qp; \
 #		quartus_tan $$qp; \
 		quartus_sta $$qp; \
-		cd quartus/$$target && quartus_cpf -c output_files/jop.sof ../../rbf/$$target.rbf; \
+		quartus_cpf  -c -q 10MHz -g 3.3 -n p quartus/$$target/output_files/jop.sof rbf/jop.svf; \
+#		cd quartus/$$target && quartus_cpf -c output_files/jop.sof ../../rbf/$$target.rbf; \
 	done
 	make config
+ifeq ($(WINDIR),)
+	minicom -b 115200 -o -D $(COM_PORT)
+else
 	e $(COM_PORT)
+endif
+	
 
 
 jop_testmon:
@@ -756,9 +771,15 @@ jop_testmon:
 		quartus_asm $$qp; \
 #		quartus_tan $$qp; \
 		quartus_sta $$qp; \
-		cd quartus/$$target && quartus_cpf -c output_files/jop.sof ../../rbf/$$target.rbf; \
+		quartus_cpf  -c -q 10MHz -g 3.3 -n p quartus/$$target/output_files/jop.sof rbf/jop.svf; \
+#		cd quartus/$$target && quartus_cpf -c output_files/jop.sof ../../rbf/$$target.rbf; \
 	done
 	make config
+ifeq ($(WINDIR),)
+	minicom -b 115200 -o -D $(COM_PORT)
+else
+	e $(COM_PORT)
+endif
 
 
 #

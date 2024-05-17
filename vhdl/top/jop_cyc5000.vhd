@@ -21,7 +21,7 @@
 --
 -- jop_max1000 based on jop_dram.vhd
 --
--- top level for a max1000 with sdram
+-- top level for a cyc5000 with sdram
 --
 
 library ieee;
@@ -30,6 +30,7 @@ use ieee.numeric_std.all;
 
 use work.jop_types.all;
 use work.sc_pack.all;
+use work.sc_arbiter_pack.all;
 use work.dram_pack.all;
 use work.jop_config_global.all;
 use work.jop_config.all;
@@ -39,7 +40,8 @@ entity jop is
   generic (
     jpc_width  : integer := 12;  -- address bits of java bytecode pc = cache size
     block_bits : integer := 4;   -- 2*block_bits is number of cache blocks
-    spm_width  : integer := 0    -- size of scratchpad RAM (in number of address bits for 32-bit words)
+    spm_width  : integer := 0;   -- size of scratchpad RAM (in number of address bits for 32-bit words)
+    cpu_cnt    : integer := 3    -- number of cpus
   );
 
   port (
@@ -74,23 +76,8 @@ entity jop is
 	flash_select : out std_logic;
 	flash_sclk : out std_logic;
 	flash_miso : in std_logic;
-	flash_mosi : out std_logic;
-	--
-	-- spi accelerometer
-	--
-	accelerometer_select : out std_logic;
-	accelerometer_sclk : out std_logic;
-	accelerometer_miso : in std_logic;
-	accelerometer_mosi : out std_logic;
-	--
-	-- sdcard (external spi)
-	-- 
-	spi_select : out std_logic;
-	spi_sclk : out std_logic;
-	spi_mosi : out std_logic;
-	spi_miso : in std_logic
-
-);
+	flash_mosi : out std_logic
+  );
 
 end jop;
 
@@ -121,18 +108,24 @@ architecture rtl of jop is
     attribute altera_attribute            : string;
     attribute altera_attribute of res_cnt : signal is "POWER_UP_LEVEL=LOW";
 
-    --
     -- jopcpu connections
-    --
-    signal sc_mem_out : sc_out_type;
-    signal sc_mem_in  : sc_in_type;
-    signal sc_io_out  : sc_out_type;
-    signal sc_io_in   : sc_in_type;
-    signal irq_in     : irq_bcf_type;
-    signal irq_out    : irq_ack_type;
-    signal exc_req    : exception_type;
+	signal sc_arb_out		: arb_out_type(0 to cpu_cnt-1);
+	signal sc_arb_in		: arb_in_type(0 to cpu_cnt-1);
+	
+	signal sc_mem_out		: sc_out_type;
+	signal sc_mem_in		: sc_in_type;
+	
+	signal sc_io_out		: sc_out_array_type(0 to cpu_cnt-1);
+	signal sc_io_in			: sc_in_array_type(0 to cpu_cnt-1);
+	signal irq_in			  : irq_in_array_type(0 to cpu_cnt-1);
+	signal irq_out			: irq_out_array_type(0 to cpu_cnt-1);
+	signal exc_req			: exception_array_type(0 to cpu_cnt-1);
 
     signal dpll : dram_pll_type;
+
+    -- cmpsync
+	signal sync_in_array	: sync_in_array_type(0 to cpu_cnt-1);
+	signal sync_out_array	: sync_out_array_type(0 to cpu_cnt-1);
 
 begin
     --
@@ -165,50 +158,42 @@ begin
             locked => dpll.locked          -- [out]
         );
 
-    cpu : entity work.jopcpu
-        generic map (
-            jpc_width  => jpc_width,
-            block_bits => block_bits,
-            spm_width  => spm_width
-        ) port map (
-            internal_clk, int_res,
-            sc_mem_out, sc_mem_in,
-            sc_io_out, sc_io_in,
-            irq_in, irq_out, exc_req
-        );
+	gen_cpu: for i in 0 to cpu_cnt-1 generate
+		cpu: entity work.jopcpu generic map (
+				jpc_width => jpc_width,
+				block_bits => block_bits,
+				spm_width => spm_width
+			) port map(
+                internal_clk,
+                int_res,
+				sc_arb_out(i),
+                sc_arb_in(i),
+				sc_io_out(i),
+                sc_io_in(i),
+                irq_in(i), 
+				irq_out(i),
+                exc_req(i)
+            );
+	end generate;
 
-    io : entity work.scio
-        port map (
+	arbiter: entity work.arbiter generic map(
+			addr_bits => SC_ADDR_SIZE,
+			cpu_cnt => cpu_cnt,
+			write_gap => 2,
+			read_gap => 1,
+			slot_length => 3
+		) port map (
             internal_clk,
             int_res,
-            sc_io_out,
-            sc_io_in,
-            irq_in,
-            irq_out,
-            exc_req,
-            txd                    => ser_txd,
-            rxd                    => ser_rxd,
-            ncts                   => ser_ncts,
-            nrts                   => ser_nrts,
-            wd                     => wd,
-            leds                   => leds,
-            buttons                => buttons,
-            flash_select           => flash_select,
-            flash_sclk             => flash_sclk,
-            flash_mosi             => flash_mosi,
-            flash_miso             => flash_miso,
-            accelerometer_select   => accelerometer_select,
-            accelerometer_sclk     => accelerometer_sclk,
-            accelerometer_mosi     => accelerometer_mosi,
-            accelerometer_miso     => accelerometer_miso,
-            spi_select             => spi_select,
-            spi_sclk               => spi_sclk,
-            spi_mosi               => spi_mosi,
-            spi_miso               => spi_miso
+			sc_arb_out,
+            sc_arb_in,
+			sc_mem_out,
+            sc_mem_in
+			-- Enable for use with Round Robin Arbiter
+			-- sync_out_array(1)
         );
-
-    scm: entity work.sc_mem_if
-        port map (
+        
+    scm: entity work.sc_mem_if port map (
             clk        => internal_clk,      -- [in]
             reset      => int_res,           -- [in]
             sc_mem_out => sc_mem_out,        -- [in]
@@ -217,5 +202,70 @@ begin
             dram_ctrl  => dram_ctrl,         -- [out]
             dram_data  => dram_data          -- [inout]
         );
+
+	-- synchronization of processors
+	sync: entity work.ihlu generic map (
+			cpu_cnt => cpu_cnt
+        ) port map (
+			clock => internal_clk,
+			reset => int_res,
+			sync_in => sync_in_array,
+			sync_out => sync_out_array
+		);
+    
+    -- io for processor 0
+    io : entity work.scio generic map (
+			cpu_id => 0,
+			cpu_cnt => cpu_cnt
+		) port map (
+            internal_clk,
+            int_res,
+            sc_io_out(0),
+            sc_io_in(0),
+			irq_in(0),
+            irq_out(0),
+            exc_req(0),
+			sync_out              => sync_out_array(0),
+			sync_in               => sync_in_array(0),
+            txd                   => ser_txd,
+            rxd                   => ser_rxd,
+            ncts                  => ser_ncts,
+            nrts                  => ser_nrts,
+            wd                    => wd,
+            leds                  => leds,
+            buttons               => buttons,
+            flash_select          => flash_select,
+            flash_sclk            => flash_sclk,
+            flash_mosi            => flash_mosi,
+            flash_miso            => flash_miso
+        );
+
+	-- io for processors with only sc_sys
+	gen_io: for i in 1 to cpu_cnt-1 generate
+		io2: entity work.sc_sys generic map (
+			addr_bits => 4,
+			clk_freq => clk_freq,
+			cpu_id => i,
+			cpu_cnt => cpu_cnt
+		) port map(
+			clk => internal_clk,
+			reset => int_res,
+			address => sc_io_out(i).address(3 downto 0),
+			wr_data => sc_io_out(i).wr_data,
+			rd => sc_io_out(i).rd,
+			wr => sc_io_out(i).wr,
+			rd_data => sc_io_in(i).rd_data,
+			rdy_cnt => sc_io_in(i).rdy_cnt,
+			irq_in => irq_in(i),
+			irq_out => irq_out(i),
+			exc_req => exc_req(i),
+			sync_out => sync_out_array(i),
+			sync_in => sync_in_array(i) --,
+			-- wd => wd_out(i)
+			-- remove the comment for RAM access counting
+			-- ram_count => ram_count
+		);
+
+	end generate;
 
 end rtl;

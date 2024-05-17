@@ -38,8 +38,8 @@ int serial_open(char *fname) {
 	}
 	
 	// set baud rate
-	cfsetispeed(&opts, B115200);
-	cfsetospeed(&opts, B115200);
+	cfsetispeed(&opts, B460800);
+	cfsetospeed(&opts, B460800);
 	
 	// local port, enable receiver
 	opts.c_cflag |= (CLOCAL | CREAD);

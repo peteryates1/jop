@@ -20,9 +20,10 @@
 
 package test;
 
-import com.jopdesign.sys.*;
-import com.jopdesign.io.*;
-import util.*;
+import com.jopdesign.io.LedSwitch;
+import com.jopdesign.io.LedSwitchFactory;
+
+import util.Timer;
 
 public class LedSwitchHardwareObjectTest
 {

@@ -122,7 +122,8 @@ port (
 
 -- SimpCon interface
 
-	address		: in std_logic_vector(addr_bits-1 downto 0);
+	-- address		: in std_logic_vector(addr_bits-1 downto 0);
+	address		: in std_logic_vector(3 downto 0);
 	wr_data		: in std_logic_vector(31 downto 0);
 	rd, wr		: in std_logic;
 	rd_data		: out std_logic_vector(31 downto 0);

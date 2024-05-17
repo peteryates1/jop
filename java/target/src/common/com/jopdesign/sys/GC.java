@@ -512,7 +512,7 @@ public class GC {
 			log("No GC when scopes are used");
 			throw OOMError;
 		}
-		log("GC allocation triggered");
+//		log("GC allocation triggered");
 		if (concurrentGc) {
 			// OOMError.fillInStackTrace();
 			throw OOMError;
